@@ -33,7 +33,7 @@ def thread_pinger(i, q):
   """Pings hosts in queue"""
   while True:
     ip = q.get()
-    args=['/bin/ping', '-c', '1', '-W', '1', str(ip)]
+    args=['/bin/ping', '-c', '1', '-W', '3', str(ip)]
     p_ping = subprocess.Popen(args,
                               shell=False,
                               stdout=subprocess.PIPE)
