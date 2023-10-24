@@ -3,7 +3,7 @@ import sys
 import socket
 import subprocess
 
-from Queue import Queue
+from queue import Queue
 from threading import Thread, Lock
 from datetime import datetime
 
@@ -17,27 +17,24 @@ for seg in segments:
         SCAN_PORTS.append(int(seg))
     else:
         start, stop = seg.split('-')
-        SCAN_PORTS += range(int(start), int(stop))
+        SCAN_PORTS += list(range(int(start), int(stop)))
         SCAN_PORTS.append(int(stop))
 SCAN_PORTS = list(set(SCAN_PORTS))
 
 lock = Lock()
 
 def scanhost(remoteServer):
-
-    remoteServerIP  = socket.gethostbyname(remoteServer)
+    remoteServerIP = socket.gethostbyname(remoteServer)
 
     try:
         output = []
         for port in SCAN_PORTS:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.setblocking(False)
             sock.settimeout(0.2)
             result = sock.connect_ex((remoteServerIP, port))
             if result == 0:
                 output.append(port)
             sock.close()
-
     except socket.gaierror:
         pass
     except socket.error:
@@ -54,26 +51,24 @@ def scanner(thread_id, ip_queue, results):
             ports = scanhost(host)
             lock.acquire()
             if len(ports):
-                print host , ports
+                print(host, ports)
             lock.release()
         ip_queue.task_done()
-    lock.acquire()
-    lock.release()
+
 ip_queue = Queue()
 results = ""
 with open("junk.txt", "r") as ins:
-        array = []
-        for line in ins:
-		try:
-			ip_queue.put(line.strip())
-			pool = []
-			for thread_id in range(THREADS):
-			     t = Thread(target=scanner, args=[thread_id, ip_queue, results])
-			     pool.append(t)
-			     t.start()
+    array = []
+    for line in ins:
+        try:
+            ip_queue.put(line.strip())
+            pool = []
+            for thread_id in range(THREADS):
+                t = Thread(target=scanner, args=[thread_id, ip_queue, results])
+                pool.append(t)
+                t.start()
 
-			for thread in pool:
-			    thread.join()
-		except:
-			raise
-
+            for thread in pool:
+                thread.join()
+        except:
+            raise
