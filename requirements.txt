@@ -1,0 +1,10 @@
+# If you don't have Termcolor installed do this cmd => pip install termcolor
+Termcolor:
+
+termcolor is required. install w/pip: pip install termcolor
+
+If enviroment set for Python3+:
+
+Subprocess:
+
+subprocess is required to install as subprocess.run. install w/pip: pip install subprocess.run
